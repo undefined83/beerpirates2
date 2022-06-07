@@ -12,9 +12,11 @@ function App() {
     e.preventDefault();
     const data = await fetch(`/api/beerrecommendations`);
     const json = await data.json();
-    if (json.message){
-      setMessage(json.message);
+    if (json[0]){
+      setMessage(JSON.stringify(json[0]));
     }
+    console.warn(json);
+    console.warn(json[0]);
     
   };
 

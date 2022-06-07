@@ -9,13 +9,16 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using MySqlConnector;
+using System.Net.Http;
+using System.Net;
+using System.Text;
 
 namespace Beerpirates.Functions
 {
     public static class GetBeerRecommendations
     {
         [FunctionName("GetBeerRecommendations")]
-        public static async Task<IActionResult> Run(
+        public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "beerrecommendations")] HttpRequest req,
             ILogger log)
         {
@@ -36,7 +39,7 @@ namespace Beerpirates.Functions
             return await GetDate(log);
         }
 
-                // to be refactored to get from config file
+        // to be refactored to get from config file
         private static MySqlConnectionStringBuilder GetMySqlConn()
         {
             return new MySqlConnectionStringBuilder
@@ -49,7 +52,7 @@ namespace Beerpirates.Functions
             };
         }
 
-                private static async Task<IActionResult> GetDate(ILogger log)
+        private static async Task<HttpResponseMessage> GetDate(ILogger log)
         {
 
             List<RecommendationModel> reccomendations = new List<RecommendationModel>();
@@ -96,12 +99,16 @@ namespace Beerpirates.Functions
                     log.LogError(e.ToString());
                 }
                 if (reccomendations.Count > 0)
-                { 
-                    return new OkObjectResult(reccomendations);
+                {
+                    var jsonToReturn = JsonConvert.SerializeObject(reccomendations);
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(jsonToReturn, Encoding.UTF8, "application/json")
+                    };
                 }
                 else
                 {
-                    return new NotFoundResult();
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
 
             }
