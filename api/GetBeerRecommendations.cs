@@ -12,6 +12,7 @@ using MySqlConnector;
 using System.Net.Http;
 using System.Net;
 using System.Text;
+using System.Linq;
 
 namespace Beerpirates.Functions
 {
@@ -80,10 +81,13 @@ namespace Beerpirates.Functions
                                 var reccomendation = new RecommendationModel()
                                 {
                                     //Id = (int)reader["Id"].ToString(),
-                                    ProdcutName = reader["ProductName"].ToString(),
-                                    ProdcutBrand = reader["ProductBrand"].ToString(),
+                                    ProductName = reader["ProductName"].ToString(),
+                                    ProductBrand = reader["ProductBrand"].ToString(),
+                                    ProductImageUri = reader["ProductImageUri"].ToString(),
+                                    ProductCategory = reader["ProductCategory"].ToString(),
+                                    ProductTags = (reader["ProductTags"].ToString()).Split(";").ToList<string>(),
                                     ProductPrice = priceDecimal,
-                                    ProductDetails = reader["ProductDetails"].ToString()
+                                    ProductDetails = reader["ProductDetails"].ToString(),
                                 };
 
                                 reccomendations.Add(reccomendation);
