@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +24,6 @@ namespace Beerpirates.Functions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -40,24 +38,10 @@ namespace Beerpirates.Functions
             return await GetDate(log);
         }
 
-        // to be refactored to get from config file
-        private static MySqlConnectionStringBuilder GetMySqlConn()
-        {
-            return new MySqlConnectionStringBuilder
-            {
-                Server = "beerpirates.mysql.database.azure.com",
-                Database = "beerpirates",
-                UserID = "agrujic",
-                Password = "-Beerpirates1",
-                SslMode = MySqlSslMode.None,
-            };
-        }
-
         private static async Task<HttpResponseMessage> GetDate(ILogger log)
         {
-
             List<RecommendationModel> reccomendations = new List<RecommendationModel>();
-            using (var conn = new MySqlConnection(GetMySqlConn().ConnectionString))
+            using (var conn = new MySqlConnection(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")))
             {
                 try
                 {
